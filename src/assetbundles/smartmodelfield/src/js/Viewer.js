@@ -36,6 +36,7 @@ const Preset = {ASSET_GENERATOR: 'assetgenerator'};
 module.exports = class Viewer {
 
   constructor (el, options) {
+
     this.el = el;
     this.options = options;
 
@@ -120,6 +121,7 @@ module.exports = class Viewer {
     this.animate = this.animate.bind(this);
     requestAnimationFrame( this.animate );
     window.addEventListener('resize', this.resize.bind(this), false);
+
   }
 
   animate (time) {
