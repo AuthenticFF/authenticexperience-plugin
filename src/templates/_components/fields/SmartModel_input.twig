@@ -1,0 +1,30 @@
+{# @var craft \craft\web\twig\variables\CraftVariable #}
+{#
+/**
+ * Authentic Experience plugin for Craft CMS 3.x
+ *
+ * SmartModel Field Input
+ *
+ * @author    Authentic F&F
+ * @copyright Copyright (c) 2018 Authentic F&F
+ * @link      https://authenticff.com
+ * @package   AuthenticExperience
+ * @since     0.1
+ */
+#}
+
+{% import "_includes/forms" as forms %}
+
+{{ forms.textField({
+        label: 'Some Field',
+        instructions: 'Enter some text here.',
+        id: name,
+        name: name,
+        value: value})
+}}
+
+<div id="gltf-viewer">
+  <div class="viewer">
+    &nbsp;
+  </div>
+</div>

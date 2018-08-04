@@ -1,0 +1,10 @@
+{
+	"version": 3,
+	"file": "SmartModel.css",
+	"sources": [
+		"../../src/scss/SmartModel.scss",
+		"../../src/scss/Viewer.scss"
+	],
+	"mappings": "ACCA,AAAA,mBAAmB,CAAA;EAEjB,OAAO,EAAE,IAAK;EACd,cAAc,EAAE,MAAO;EACvB,MAAM,EAAE,KAAM;EACd,KAAK,EAAE,IAAK,GAeb;EApBD,AAOE,mBAPiB,CAOjB,CAAC,CAAC;IACA,UAAU,EAAE,UAAW,GACxB;EATH,AAWE,mBAXiB,CAWjB,OAAO,CAAC;IACN,KAAK,EAAE,IAAK;IACZ,MAAM,EAAE,IAAK;IACb,SAAS,EAAE,CAAE;IACb,WAAW,EAAE,CAAE;IACf,QAAQ,EAAE,QAAS;IACnB,GAAG,EAAE,CAAE,GACR;;ADhBH;;;;;;;;;;GAUG",
+	"names": []
+}

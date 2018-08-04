@@ -1,0 +1,40 @@
+{
+    "name": "authenticff/authentic-experience",
+    "description": "Authentic Experience",
+    "type": "craft-plugin",
+    "version": "0.1",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "authentic experience"
+    ],
+    "support": {
+        "docs": "???",
+        "issues": "???"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Authentic F&F",
+            "homepage": "https://authenticff.com"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.0.0-RC1"
+    },
+    "autoload": {
+        "psr-4": {
+          "authenticff\\authenticexperience\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "Authentic Experience",
+        "handle": "authentic-experience",
+        "hasCpSettings": false,
+        "hasCpSection": false,
+        "changelogUrl": "???",
+        "class": "authenticff\\authenticexperience\\AuthenticExperience"
+    }
+}

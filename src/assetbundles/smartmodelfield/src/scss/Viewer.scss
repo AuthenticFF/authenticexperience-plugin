@@ -1,0 +1,22 @@
+
+#fields-gltf-viewer{
+
+  display: flex;
+  flex-direction: column;
+  height: 500px;
+  width: 100%;
+
+  * {
+    box-sizing: border-box;
+  }
+
+  .viewer {
+    width: 100%;
+    height: 100%;
+    flex-grow: 1;
+    flex-shrink: 1;
+    position: absolute;
+    top: 0;
+  }
+
+}
