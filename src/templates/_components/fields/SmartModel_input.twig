@@ -15,13 +15,60 @@
 
 {% import "_includes/forms" as forms %}
 
-{{ forms.textField({
-        label: 'Some Field',
-        instructions: 'Enter some text here.',
-        id: name,
-        name: name,
-        value: value})
-}}
+{{ forms.elementSelect({
+    id: smartModelAssetId,
+    name: smartModelAssetName,
+    viewMode: "large",
+    elements: smartModelAssetElements,
+    elementType: smartModelAssetElementType,
+    criteria: {
+      kind: []
+    },
+    jsClass: 'Craft.AssetSelectInput',
+    selectionLabel: "Select File",
+    sources: [],
+    limit: 1,
+    warning: false,
+}) }}
+
+{{ forms.editableTableField({
+    label: "Features",
+    instructions: "[something goes here]",
+    id: smartModelFeaturesId,
+    name: smartModelFeaturesName,
+    cols: {
+        featureTitle: {
+            type: 'singleline',
+            heading: "Feature Title",
+        },
+        featureBody: {
+            type: 'multiline',
+            heading: "Feature Body"
+        },
+        featureCoordinates: {
+            type: 'singleline',
+            heading: "Feature Coordinates"
+        },
+    },
+    rows: smartModelFeaturesRows,
+    staticRows: false,
+    errors: []
+}) }}
+
+{# {{ forms.elementSelect({
+    id: "smartModelAssetIds",
+    name: "smartModelAssetIds",
+    viewMode: "large",
+    elements: smartModelAssetElements,
+    elementType: elementType,
+    criteria: {
+    },
+    jsClass: 'Craft.AssetSelectInput',
+    selectionLabel: "Select File",
+    sources: [],
+    limit: 1,
+    warning: false,
+}) }} #}
 
 <div id="gltf-viewer">
   <div class="viewer">

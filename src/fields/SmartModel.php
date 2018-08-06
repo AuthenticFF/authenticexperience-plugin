@@ -19,6 +19,7 @@ use craft\base\Field;
 use craft\helpers\Db;
 use yii\db\Schema;
 use craft\helpers\Json;
+use craft\elements\Asset;
 
 /**
  * SmartModel Field
@@ -44,6 +45,11 @@ class SmartModel extends Field
      * @var string
      */
     public $someAttribute = 'Some Default';
+
+    public $smartModelData = [
+      "smartModelAssetId" => [],
+      "features" => []
+    ];
 
     // Static Methods
     // =========================================================================
@@ -75,8 +81,8 @@ class SmartModel extends Field
     {
         $rules = parent::rules();
         $rules = array_merge($rules, [
-            ['someAttribute', 'string'],
-            ['someAttribute', 'default', 'value' => 'Some Default'],
+            // ['someAttribute', 'string'],
+            // ['someAttribute', 'default', 'value' => 'Some Default'],
         ]);
         return $rules;
     }
@@ -94,7 +100,7 @@ class SmartModel extends Field
      */
     public function getContentColumnType(): string
     {
-        return Schema::TYPE_STRING;
+        return Schema::TYPE_JSON;
     }
 
     /**
@@ -112,7 +118,22 @@ class SmartModel extends Field
      */
     public function normalizeValue($value, ElementInterface $element = null)
     {
-        return $value;
+
+      $smartModelData = $value;
+
+      // $smartModelData = [
+      //   "smartModelAssetId" => 1,
+      //   "features" => [
+      //     [
+      //       "featureTitle" => "Feature Title 1",
+      //       "featureBody" => "Feature Body 1",
+      //       "featureCoordinates" => [0,0,1]
+      //     ]
+      //   ]
+      // ];
+
+      return $smartModelData;
+
     }
 
     /**
@@ -130,6 +151,58 @@ class SmartModel extends Field
      */
     public function serializeValue($value, ElementInterface $element = null)
     {
+
+        // var_dump($value);
+        // var_dump(Craft::$app->request);
+
+        // var_dump( Craft::$app->request->getParam("fields[smartModelFeatures]") );
+        // die();
+
+        // die();
+
+        // $features = [];
+        // $fieldExists = true;
+        // $index = 0;
+        //
+        // while ($fieldExists) {
+        //
+        //   $featureTitle = Craft::$app->request->getParam('fields[smartModelFeatures][$index]["featureTitle"]', false)
+        //   $featureBody = Craft::$app->request->getParam('fields[smartModelFeatures][$index]["featureBody"]', false)
+        //   $featureCoordinates = Craft::$app->request->getParam('fields[smartModelFeatures][$index]["featureCoordinates"]', false)
+        //
+        //   if(! $featureTitle)
+        //   {
+        //     $fieldExists = false;
+        //   }
+        //   else
+        //   {
+        //       $features[] = [
+        //         "featureTitle" => $featureTitle,
+        //         "featureBody" => $featureBody,
+        //         "featureCoordinates" => $featureCoordinates
+        //       ]
+        //   }
+        //
+        // }
+
+        // fields[smartModelAsset]:
+        // $smartModelAssetId = Craft::$app->request->getParam("fields[smartModelAsset][]", []);
+        // fields[smartModelFeatures]:
+        // fields[smartModelFeatures][0][featureTitle]: a
+        // fields[smartModelFeatures][0][featureBody]: b
+        // fields[smartModelFeatures][0][featureCoordinates]: c
+
+        // $smartModelData = [
+        //   "smartModelAssetId" => 2,
+        //   "features" => [
+        //     [
+        //       "featureTitle" => "Feature Title 1",
+        //       "featureBody" => "Feature Body 1",
+        //       "featureCoordinates" => [0,0,1]
+        //     ]
+        //   ]
+        // ];
+
         return parent::serializeValue($value, $element);
     }
 
@@ -335,36 +408,91 @@ class SmartModel extends Field
      */
     public function getInputHtml($value, ElementInterface $element = null): string
     {
-        // Register our asset bundle
-        Craft::$app->getView()->registerAssetBundle(SmartModelFieldAsset::class);
 
-        // Get our id and namespace
-        $id = Craft::$app->getView()->formatInputId($this->handle);
-        $namespacedId = Craft::$app->getView()->namespaceInputId($id);
+      // decoding our json
+      $value = json_decode($value);
 
-        $assetUrl = \Craft::$app->assetManager->getPublishedUrl('@authenticff/authenticexperience/assetbundles/smartmodelfield/dist', true);
+      $featureRows = [];
 
-        // Variables to pass down to our field JavaScript to let it namespace properly
-        $jsonVars = [
-            'id' => $id,
-            'name' => $this->handle,
-            'namespace' => $namespacedId,
-            'prefix' => Craft::$app->getView()->namespaceInputId(''),
-            'assetUrl' => $assetUrl
-            ];
-        $jsonVars = Json::encode($jsonVars);
-        Craft::$app->getView()->registerJs("$('#{$namespacedId}-field').AuthenticExperienceSmartModel(" . $jsonVars . ");");
+      foreach ($value->smartModelFeatures as $key => $feature)
+      {
+        $featureRows[] = [
+          "featureTitle" => [
+            "value" => $feature->featureTitle
+          ],
+          "featureBody" => [
+            "value" => $feature->featureBody
+          ],
+          "featureCoordinates" => [
+            "value" => $feature->featureCoordinates
+          ],
+        ];
+      }
 
-        // Render the input template
-        return Craft::$app->getView()->renderTemplate(
-            'authentic-experience/_components/fields/SmartModel_input',
-            [
-                'name' => $this->handle,
-                'value' => $value,
-                'field' => $this,
-                'id' => $id,
-                'namespacedId' => $namespacedId,
-            ]
-        );
+      // Register our asset bundle
+      Craft::$app->getView()->registerAssetBundle(SmartModelFieldAsset::class);
+
+      //
+      // Top level field info
+      //
+      $name = $this->handle;
+      $id = Craft::$app->getView()->formatInputId($this->handle);
+      $namespacedId = Craft::$app->getView()->namespaceInputId($id);
+
+      //
+      // Setting up the names, ids, and namespaces for our fields
+      //
+      $smartModelAssetName = $this->handle . "[smartModelAsset]";
+      $smartModelAssetId = Craft::$app->getView()->formatInputId("smartModelAssetId");
+      $smartModelAssetNamespacedId = Craft::$app->getView()->namespaceInputId($smartModelAssetId);
+
+      $smartModelFeaturesName = $this->handle . "[smartModelFeatures]";
+      $smartModelFeaturesId = Craft::$app->getView()->formatInputId("smartModelFeaturesId");
+      $smartModelFeaturesNamespacedId = Craft::$app->getView()->namespaceInputId($smartModelFeaturesId);
+
+      $assetUrl = \Craft::$app->assetManager->getPublishedUrl('@authenticff/authenticexperience/assetbundles/smartmodelfield/dist', true);
+
+      //
+      // Variables for javascript
+      //
+      $jsonVars = [
+        'smartModelAssetName' => $smartModelAssetName,
+        'smartModelAssetId' => $smartModelAssetId,
+        'smartModelAssetNamespacedId' => $smartModelAssetNamespacedId,
+        'smartModelAssetElements' => null,
+        'smartModelAssetElementType' => Asset::class,
+        'smartModelFeaturesName' => $smartModelFeaturesName,
+        'smartModelFeaturesId' => $smartModelFeaturesId,
+        'smartModelFeaturesNamespacedId' => $smartModelFeaturesNamespacedId,
+        'smartModelFeaturesRows' => $featureRows,
+        'prefix' => Craft::$app->getView()->namespaceInputId(''),
+        'assetUrl' => $assetUrl
+        ];
+      $jsonVars = Json::encode($jsonVars);
+
+      // attach to top-level field
+      Craft::$app->getView()->registerJs("$('#{$namespacedId}-field').AuthenticExperienceSmartModel(" . $jsonVars . ");");
+
+      //
+      // Variables for input
+      //
+      $variables = [];
+      $variables["smartModelAssetName"] = $smartModelAssetName;
+      $variables["smartModelAssetId"] = $smartModelAssetId;
+      $variables["smartModelAssetNamespacedId"] = $smartModelAssetNamespacedId;
+      $variables["smartModelAssetElements"] = null;
+      $variables["smartModelAssetElementType"] = Asset::class;
+
+      $variables["smartModelFeaturesName"] = $smartModelFeaturesName;
+      $variables["smartModelFeaturesId"] = $smartModelFeaturesId;
+      $variables["smartModelFeaturesNamespacedId"] = $smartModelFeaturesNamespacedId;
+      $variables["smartModelFeaturesRows"] = $featureRows;
+
+      // Render the input template
+      return Craft::$app->getView()->renderTemplate(
+          'authentic-experience/_components/fields/SmartModel_input',
+          $variables
+      );
+
     }
 }

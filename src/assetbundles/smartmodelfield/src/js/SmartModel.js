@@ -1,5 +1,6 @@
 
 var Viewer = require("./Viewer");
+var Photosphere = require("./Photosphere");
 
 /**
  * Authentic Experience plugin for Craft CMS
@@ -38,20 +39,44 @@ var Viewer = require("./Viewer");
 
             $(function () {
 
+              console.log(self.options);
+              return;
+
               /* -- _this.options gives us access to the $jsonVars that our FieldType passed down to us */
 
-              var fileUrl = self.options.assetUrl + "/models/acoma.glb";
-              console.log(fileUrl);
+              var initGltf = function(){
 
-              //
-              var $viewerEl = $("#fields-gltf-viewer .viewer");
-              var options = {};
-              var viewer = new Viewer($viewerEl[0], options);
+                var viewerOptions = {};
+                var fileUrl = self.options.assetUrl + "/models/acoma.glb";
+                var $viewerEl = $("#fields-gltf-viewer .viewer");
 
-              viewer
-               .load(fileUrl, "", new Map())
-               .catch((e) => this.onError(e))
-               .then(cleanup);
+                var viewer = new Viewer($viewerEl[0], viewerOptions);
+
+                viewer
+                 .load(fileUrl, "", new Map())
+                 .catch((e) => this.onError(e))
+                 .then(cleanup);
+
+              }
+
+              var initPhotosphere = function(){
+
+                var $viewerEl = $("#fields-gltf-viewer .viewer");
+                var fileUrl = self.options.assetUrl + "/photospheres/photosphere-outside-1.jpg";
+
+                console.log(fileUrl);
+
+            		var photosphere = new Photosphere($viewerEl, fileUrl, {
+            			view: 75,
+            			speed: 0,
+            			y: 0
+            		});
+
+                window.onresize = photosphere.resize;
+
+              }
+
+              // initPhotosphere();
 
             });
         }
