@@ -119,7 +119,11 @@ class SmartModel extends Field
     public function normalizeValue($value, ElementInterface $element = null)
     {
 
-      $smartModelData = $value;
+      // decoding our json
+      $smartModelData = json_decode($value);
+
+      // var_dump($smartModelData);
+      // die();
 
       // $smartModelData = [
       //   "smartModelAssetId" => 1,
@@ -409,11 +413,10 @@ class SmartModel extends Field
     public function getInputHtml($value, ElementInterface $element = null): string
     {
 
-      // decoding our json
-      $value = json_decode($value);
-
+      //
+      // Setting up feature rows
+      //
       $featureRows = [];
-
       foreach ($value->smartModelFeatures as $key => $feature)
       {
         $featureRows[] = [
@@ -426,8 +429,20 @@ class SmartModel extends Field
           "featureCoordinates" => [
             "value" => $feature->featureCoordinates
           ],
+          "featureCaptureCoordinates" => [
+              "value" => '<a href="javascript:;" class="btn capture">Capture</a>' ,
+              "class" => "thin"
+          ]
         ];
       }
+
+      // var_dump($value);
+      // die();
+
+      //
+      // Setting up our Asset Data
+      //
+      $assetElements = \craft\elements\Asset::find()->id(9);
 
       // Register our asset bundle
       Craft::$app->getView()->registerAssetBundle(SmartModelFieldAsset::class);
@@ -450,7 +465,8 @@ class SmartModel extends Field
       $smartModelFeaturesId = Craft::$app->getView()->formatInputId("smartModelFeaturesId");
       $smartModelFeaturesNamespacedId = Craft::$app->getView()->namespaceInputId($smartModelFeaturesId);
 
-      $assetUrl = \Craft::$app->assetManager->getPublishedUrl('@authenticff/authenticexperience/assetbundles/smartmodelfield/dist', true);
+      // old asset url
+      // $assetUrl = \Craft::$app->assetManager->getPublishedUrl('@authenticff/authenticexperience/assetbundles/smartmodelfield/dist', true);
 
       //
       // Variables for javascript
@@ -459,14 +475,14 @@ class SmartModel extends Field
         'smartModelAssetName' => $smartModelAssetName,
         'smartModelAssetId' => $smartModelAssetId,
         'smartModelAssetNamespacedId' => $smartModelAssetNamespacedId,
-        'smartModelAssetElements' => null,
+        'smartModelAssetElements' => $value->smartModelAsset,
         'smartModelAssetElementType' => Asset::class,
         'smartModelFeaturesName' => $smartModelFeaturesName,
         'smartModelFeaturesId' => $smartModelFeaturesId,
         'smartModelFeaturesNamespacedId' => $smartModelFeaturesNamespacedId,
         'smartModelFeaturesRows' => $featureRows,
         'prefix' => Craft::$app->getView()->namespaceInputId(''),
-        'assetUrl' => $assetUrl
+        'assetUrl' => count($assetElements) ? $assetElements[0]->url : false
         ];
       $jsonVars = Json::encode($jsonVars);
 
@@ -480,8 +496,9 @@ class SmartModel extends Field
       $variables["smartModelAssetName"] = $smartModelAssetName;
       $variables["smartModelAssetId"] = $smartModelAssetId;
       $variables["smartModelAssetNamespacedId"] = $smartModelAssetNamespacedId;
-      $variables["smartModelAssetElements"] = null;
+      $variables["smartModelAssetElements"] = $assetElements;
       $variables["smartModelAssetElementType"] = Asset::class;
+      $variables["smartModelAssetSources"] = ["handle:". "experience"];
 
       $variables["smartModelFeaturesName"] = $smartModelFeaturesName;
       $variables["smartModelFeaturesId"] = $smartModelFeaturesId;

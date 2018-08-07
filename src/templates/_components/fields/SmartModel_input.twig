@@ -26,7 +26,7 @@
     },
     jsClass: 'Craft.AssetSelectInput',
     selectionLabel: "Select File",
-    sources: [],
+    sources: smartModelAssetSources,
     limit: 1,
     warning: false,
 }) }}
@@ -48,6 +48,10 @@
         featureCoordinates: {
             type: 'singleline',
             heading: "Feature Coordinates"
+        },
+        featureCaptureCoordinates: {
+            type: 'html',
+            heading: "Capture Coordinates"
         },
     },
     rows: smartModelFeaturesRows,

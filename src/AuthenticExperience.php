@@ -19,6 +19,9 @@ use craft\events\PluginEvent;
 use craft\services\Fields;
 use craft\events\RegisterComponentTypesEvent;
 
+use markhuot\CraftQL\Types\VolumeInterface;
+use markhuot\CraftQL\FieldBehaviors\AssetQueryArguments;
+
 use yii\base\Event;
 
 /**
@@ -97,6 +100,74 @@ class AuthenticExperience extends Plugin
                 }
             }
         );
+
+
+        Event::on(authenticff\authenticexperience\fields\SmartModel::class, 'craftQlGetFieldSchema', function (\markhuot\CraftQL\Events\GetFieldSchema $event) {
+
+          $field = $event->sender;
+
+          // asset [object]
+          // features [object]
+
+          // var_dump($field);
+
+          // $event->schema->addField('assets')
+          //   ->type(VolumeInterface::class)
+          //   ->use(new AssetQueryArguments)
+          //   ->lists()
+          //   ->resolve(function ($root, $args) {
+          //       $criteria = \craft\elements\Asset::find();
+          //       foreach ($args as $key => $value) {
+          //           $criteria = $criteria->{$key}($value);
+          //       }
+          //       return $criteria->all();
+          //   });
+
+          // $this->addField('assets')
+          //   ->type(VolumeInterface::class)
+          //   ->use(new AssetQueryArguments)
+          //   ->lists()
+          //   ->resolve(function ($root, $args) {
+          //       $criteria = \craft\elements\Asset::find();
+          //       foreach ($args as $key => $value) {
+          //           $criteria = $criteria->{$key}($value);
+          //       }
+          //       return $criteria->all();
+          //   });
+          //
+          // $this->addField('categories')
+          // ->lists()
+          // ->type(CategoryInterface::class)
+          // ->resolve(function ($root, $args) {
+          //     return $root['edges'];
+          // });
+
+          // $object = $event->schema->createObjectType('MapPoint')
+          //   ->addStringField('lat')
+          //   ->addStringField('lng')
+          //   ->addStringField('zoom');
+          //
+
+          // $object = $event->schema->createObjectType('smartModelAsset')
+          //       ->addStringField('featureTitle')
+          //       ->addStringField('featureBody')
+          //       ->addStringField('featureCoordinates');
+
+          // $object = $event->schema->createObjectType('MapPoint')
+          //   ->addStringField('lat')
+          //   ->addStringField('lng')
+          //   ->addStringField('zoom');
+          //
+          // $event->schema->addField($field)
+          //   ->type($object)
+          //   ->lists();
+
+          $event->schema->addField('smartModelAsset')
+            ->type(VolumeInterface::class)
+            ->lists()
+            ->description('Assets associated to the Smart Model field.');
+
+        });
 
 /**
  * Logging in Craft involves using one of the following methods:
