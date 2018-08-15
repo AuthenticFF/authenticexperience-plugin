@@ -32,12 +32,15 @@ var Photosphere = function($el, fileUrl, options){
     // Setup camera
   	camera = new THREE.PerspectiveCamera(75, innerWidth / innerHeight, 1, 1100);
   	camera.target = new THREE.Vector3(0, 0, 0);
+    camera.fov = 33.43;
+  	camera.updateProjectionMatrix();
 
     // Setup the scene
   	scene = new THREE.Scene();
 
   	var geometry = new THREE.SphereBufferGeometry(500, 60, 40);
   	geometry.scale(-1, 1, 1);
+    // geometry.rotateX(0);
     // Note: we're invert the geometry on the x-axis so that all of the faces point inward
 
     // Load the image
@@ -160,6 +163,8 @@ var Photosphere = function($el, fileUrl, options){
   	var fov = camera.fov + event.deltaY * 0.05;
 
   	camera.fov = THREE.Math.clamp(fov, 10, 75);
+
+    console.log(camera.fov);
 
   	camera.updateProjectionMatrix();
 

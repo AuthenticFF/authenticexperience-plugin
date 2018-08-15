@@ -26,12 +26,13 @@
     },
     jsClass: 'Craft.AssetSelectInput',
     selectionLabel: "Select File",
-    sources: smartModelAssetSources,
     limit: 1,
     warning: false,
 }) }}
 
-{{ forms.editableTableField({
+{# sources: smartModelAssetSources, #}
+
+{{ forms.editableTable({
     label: "Features",
     instructions: "[something goes here]",
     id: smartModelFeaturesId,
@@ -47,12 +48,11 @@
         },
         featureCoordinates: {
             type: 'singleline',
-            heading: "Feature Coordinates"
-        },
-        featureCaptureCoordinates: {
-            type: 'html',
-            heading: "Capture Coordinates"
-        },
+            heading: "Feature Coordinates",
+            placeholder: "Double click to set..."
+        }
+    },
+    defaultValues: {
     },
     rows: smartModelFeaturesRows,
     staticRows: false,

@@ -14,15 +14,16 @@ use authenticff\authenticexperience\fields\SmartModel as SmartModelField;
 
 use Craft;
 use craft\base\Plugin;
-use craft\services\Plugins;
 use craft\events\PluginEvent;
-use craft\services\Fields;
 use craft\events\RegisterComponentTypesEvent;
+use craft\events\RegisterTemplateRootsEvent;
+use craft\services\Fields;
+use craft\services\Plugins;
+use craft\web\View;
+use yii\base\Event;
 
 use markhuot\CraftQL\Types\VolumeInterface;
 use markhuot\CraftQL\FieldBehaviors\AssetQueryArguments;
-
-use yii\base\Event;
 
 /**
  * Craft plugins are very much like little applications in and of themselves. We’ve made
@@ -102,72 +103,75 @@ class AuthenticExperience extends Plugin
         );
 
 
-        Event::on(authenticff\authenticexperience\fields\SmartModel::class, 'craftQlGetFieldSchema', function (\markhuot\CraftQL\Events\GetFieldSchema $event) {
+        Event::on(
+          \authenticff\authenticexperience\fields\SmartModel::class,
+          'craftQlGetFieldSchema',
+          function (\markhuot\CraftQL\Events\GetFieldSchema $event) {
 
           $field = $event->sender;
-
-          // asset [object]
-          // features [object]
-
-          // var_dump($field);
-
-          // $event->schema->addField('assets')
-          //   ->type(VolumeInterface::class)
-          //   ->use(new AssetQueryArguments)
-          //   ->lists()
-          //   ->resolve(function ($root, $args) {
-          //       $criteria = \craft\elements\Asset::find();
-          //       foreach ($args as $key => $value) {
-          //           $criteria = $criteria->{$key}($value);
-          //       }
-          //       return $criteria->all();
-          //   });
-
-          // $this->addField('assets')
-          //   ->type(VolumeInterface::class)
-          //   ->use(new AssetQueryArguments)
-          //   ->lists()
-          //   ->resolve(function ($root, $args) {
-          //       $criteria = \craft\elements\Asset::find();
-          //       foreach ($args as $key => $value) {
-          //           $criteria = $criteria->{$key}($value);
-          //       }
-          //       return $criteria->all();
-          //   });
           //
-          // $this->addField('categories')
-          // ->lists()
-          // ->type(CategoryInterface::class)
-          // ->resolve(function ($root, $args) {
-          //     return $root['edges'];
-          // });
+          // $object = $event->schema->createObjectType("SmartModel");
+          // $object->addField('smartModelAsset');
 
-          // $object = $event->schema->createObjectType('MapPoint')
-          //   ->addStringField('lat')
-          //   ->addStringField('lng')
-          //   ->addStringField('zoom');
-          //
+          // ->type(VolumeInterface::class);
+          // ->use(new AssetQueryArguments)
+          // ->lists();
+          // $object->addField("smartModelFeatures");
+          // var_dump($object);
 
-          // $object = $event->schema->createObjectType('smartModelAsset')
-          //       ->addStringField('featureTitle')
-          //       ->addStringField('featureBody')
-          //       ->addStringField('featureCoordinates');
+          // $event->schema
+          //   ->addField($field)
+          //   ->type($object);
 
-          // $object = $event->schema->createObjectType('MapPoint')
-          //   ->addStringField('lat')
-          //   ->addStringField('lng')
-          //   ->addStringField('zoom');
-          //
-          // $event->schema->addField($field)
-          //   ->type($object)
-          //   ->lists();
+          $object = $event->schema->createObjectType("SmartModel");
 
-          $event->schema->addField('smartModelAsset')
+          $object->addField('assets')
             ->type(VolumeInterface::class)
+            ->use(new AssetQueryArguments)
             ->lists()
-            ->description('Assets associated to the Smart Model field.');
+            ->resolve(function($root, $args) {
 
-        });
+              // $root is the `craft\base\Field` object. So you can call ->normalizeValue() here if you want
+              $values = $root->normalizeValue();
+
+              $criteria = \craft\elements\Asset::find();
+              $criteria = $criteria->id($values['smartModelAsset']);
+              return $criteria->all();
+
+            });
+
+          // $object->addField('features')
+          //   ->type(/* this might need to be another custom type */)
+          //   ->lists()
+          //   ->resolve(function($root, $args) {
+          //
+          //   });
+
+          $event->schema
+            ->addField($field)
+            ->type($object);
+
+        }
+      );
+
+      /**
+       * Registering our templates
+       */
+      Event::on(
+        View::class,
+        View::EVENT_REGISTER_SITE_TEMPLATE_ROOTS,
+        function(RegisterTemplateRootsEvent $event) {
+          $event->roots['authenticexperience'] = __DIR__ . '/templates';
+        }
+      );
+
+      Event::on(
+        View::class,
+        View::EVENT_REGISTER_CP_TEMPLATE_ROOTS,
+        function(RegisterTemplateRootsEvent $event) {
+          $event->roots['authenticexperience'] = __DIR__ . '/templates';
+        }
+      );
 
 /**
  * Logging in Craft involves using one of the following methods:

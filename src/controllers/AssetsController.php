@@ -60,8 +60,8 @@ class AssetsController extends Controller
     public function actionGetAsset()
     {
 
-        $asset = \craft\elements\Asset::find()->id(9)->first();
-
+        $assetId = Craft::$app->request->getParam("id", false);
+        $asset = \craft\elements\Asset::find()->id($assetId)->first();
         return $this->asJson($asset);
 
     }
