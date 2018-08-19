@@ -108,47 +108,70 @@ class AuthenticExperience extends Plugin
           'craftQlGetFieldSchema',
           function (\markhuot\CraftQL\Events\GetFieldSchema $event) {
 
+          $event->handled = true;
           $field = $event->sender;
+          $schema = $event->schema;
+
+          $object = $schema->createObjectType("SmartModel");
+
           //
-          // $object = $event->schema->createObjectType("SmartModel");
-          // $object->addField('smartModelAsset');
-
-          // ->type(VolumeInterface::class);
-          // ->use(new AssetQueryArguments)
-          // ->lists();
-          // $object->addField("smartModelFeatures");
-          // var_dump($object);
-
-          // $event->schema
-          //   ->addField($field)
-          //   ->type($object);
-
-          $object = $event->schema->createObjectType("SmartModel");
-
+          // Assets field
+          //
           $object->addField('assets')
             ->type(VolumeInterface::class)
-            ->use(new AssetQueryArguments)
             ->lists()
             ->resolve(function($root, $args) {
-
-              // $root is the `craft\base\Field` object. So you can call ->normalizeValue() here if you want
-              $values = $root->normalizeValue();
-
               $criteria = \craft\elements\Asset::find();
-              $criteria = $criteria->id($values['smartModelAsset']);
+              $criteria = $criteria->id($root['smartModelAsset']);
               return $criteria->all();
-
             });
 
-          // $object->addField('features')
-          //   ->type(/* this might need to be another custom type */)
-          //   ->lists()
-          //   ->resolve(function($root, $args) {
           //
-          //   });
+          // Features Model
+          //
+          $featuresObject = $schema->createObjectType("FeaturesModel");
 
-          $event->schema
-            ->addField($field)
+          // title
+          $featuresObject->addField("title")
+            ->resolve(function($root, $args){
+              return $root["featureTitle"];
+            });
+
+          // body
+          $featuresObject->addStringField("body")
+            ->resolve(function($root, $args){
+              return $root["featureBody"];
+            });
+
+          // coordinates
+          $coordinatesModel = $schema->createObjectType("CoordinatesModel");
+          $coordinatesModel->addField("latitude")
+            ->resolve(function($root, $args){
+              return explode(",", $root)[1];
+            });
+          $coordinatesModel->addField("longitude")
+            ->resolve(function($root, $args){
+              return explode(",", $root)[0];
+            });
+
+          $featuresObject->addStringField("coordinates")
+            ->type($coordinatesModel)
+            ->resolve(function($root, $args){
+              return $root["featureCoordinates"];
+            });
+
+
+          //
+          // Adding features to schema
+          //
+          $object->addField('features')
+            ->type($featuresObject)
+            ->lists()
+            ->resolve(function($root, $args) {
+              return $root["smartModelFeatures"];
+            });
+
+          $schema->addField($field)
             ->type($object);
 
         }
