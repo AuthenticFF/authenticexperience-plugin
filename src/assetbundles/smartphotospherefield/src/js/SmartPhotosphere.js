@@ -66,6 +66,9 @@ var PhotoSphereViewer = require("photo-sphere-viewer");
                 // adding coordinates
                 var $el = $(this);
                 var coordinates = self.photosphere.getPosition();
+
+                console.log(coordinates);
+
                 coordinates = [coordinates.longitude, coordinates.latitude];
                 $el.val(coordinates);
 
@@ -107,8 +110,9 @@ var PhotoSphereViewer = require("photo-sphere-viewer");
             container: self.$viewerEl[0],
             panorama: fileUrl,
             anim_speed: '0rpm',
-            default_long: '-80deg',
-            default_lat: '-10deg',
+            default_fov: 30,
+            default_long: '-90deg',
+            default_lat: '0deg',
             markers: this.markers
           });
 
