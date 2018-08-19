@@ -11,6 +11,7 @@
 namespace authenticff\authenticexperience;
 
 use authenticff\authenticexperience\fields\SmartModel as SmartModelField;
+use authenticff\authenticexperience\fields\SmartPhotosphere as SmartPhotosphereField;
 
 use Craft;
 use craft\base\Plugin;
@@ -88,6 +89,7 @@ class AuthenticExperience extends Plugin
             Fields::EVENT_REGISTER_FIELD_TYPES,
             function (RegisterComponentTypesEvent $event) {
                 $event->types[] = SmartModelField::class;
+                $event->types[] = SmartPhotosphereField::class;
             }
         );
 
@@ -104,7 +106,7 @@ class AuthenticExperience extends Plugin
 
 
         Event::on(
-          \authenticff\authenticexperience\fields\SmartModel::class,
+          \authenticff\authenticexperience\fields\SmartPhotosphere::class,
           'craftQlGetFieldSchema',
           function (\markhuot\CraftQL\Events\GetFieldSchema $event) {
 
@@ -112,7 +114,7 @@ class AuthenticExperience extends Plugin
           $field = $event->sender;
           $schema = $event->schema;
 
-          $object = $schema->createObjectType("SmartModel");
+          $object = $schema->createObjectType("SmartPhotosphere");
 
           //
           // Assets field
@@ -122,12 +124,12 @@ class AuthenticExperience extends Plugin
             ->lists()
             ->resolve(function($root, $args) {
               $criteria = \craft\elements\Asset::find();
-              $criteria = $criteria->id($root['smartModelAsset']);
+              $criteria = $criteria->id($root['smartPhotosphereAsset']);
               return $criteria->all();
             });
 
           //
-          // Features Model
+          // Features Photosphere
           //
           $featuresObject = $schema->createObjectType("FeaturesModel");
 
@@ -168,7 +170,7 @@ class AuthenticExperience extends Plugin
             ->type($featuresObject)
             ->lists()
             ->resolve(function($root, $args) {
-              return $root["smartModelFeatures"];
+              return $root["smartPhotosphereFeatures"];
             });
 
           $schema->addField($field)

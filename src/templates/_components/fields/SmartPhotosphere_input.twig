@@ -1,0 +1,74 @@
+{# @var craft \craft\web\twig\variables\CraftVariable #}
+{#
+/**
+ * Authentic Experience plugin for Craft CMS 3.x
+ *
+ * SmartPhotosphere Field Input
+ *
+ * @author    Authentic F&F
+ * @copyright Copyright (c) 2018 Authentic F&F
+ * @link      https://authenticff.com
+ * @package   AuthenticExperience
+ * @since     0.1
+ */
+#}
+
+{% import "_includes/forms" as forms %}
+
+{{ forms.elementSelect({
+    id: smartPhotosphereAssetId,
+    name: smartPhotosphereAssetName,
+    viewMode: "large",
+    elements: smartPhotosphereAssetElements,
+    elementType: smartPhotosphereAssetElementType,
+    criteria: {
+      kind: []
+    },
+    jsClass: 'Craft.AssetSelectInput',
+    selectionLabel: "Select File",
+    limit: 1,
+    warning: false,
+}) }}
+
+{# sources: smartPhotosphereAssetSources, #}
+
+<div class="photosphere-features-container">
+
+  {{ forms.editableTable({
+      label: "Features",
+      instructions: "[something goes here]",
+      id: smartPhotosphereFeaturesId,
+      name: smartPhotosphereFeaturesName,
+      cols: {
+          featureTitle: {
+              type: 'singleline',
+              heading: "Feature Title",
+          },
+          featureBody: {
+              type: 'multiline',
+              heading: "Feature Body"
+          },
+          featureCoordinates: {
+              type: 'singleline',
+              heading: "Feature Coordinates",
+              placeholder: "Double click to set..."
+          }
+      },
+      defaultValues: {
+      },
+      rows: smartPhotosphereFeaturesRows,
+      staticRows: false,
+      errors: []
+  }) }}
+
+</div>
+
+<div id="photosphere-viewer">
+  <div class="viewer">
+
+    <span class="message">
+      Select A File Above
+    </span>
+
+  </div>
+</div>

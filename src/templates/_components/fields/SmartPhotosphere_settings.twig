@@ -1,0 +1,26 @@
+{# @var craft \craft\web\twig\variables\CraftVariable #}
+{#
+/**
+ * Authentic Experience plugin for Craft CMS
+ *
+ * SmartModel Field Settings
+ *
+ * @author    Authentic F&F
+ * @copyright Copyright (c) 2018 Authentic F&F
+ * @link      https://authenticff.com
+ * @package   AuthenticExperience
+ * @since     0.1
+ */
+#}
+
+{% import "_includes/forms" as forms %}
+
+{% do view.registerAssetBundle("authenticff\\authenticexperience\\assetbundles\\smartphotospherefield\\SmartPhotosphereFieldAsset") %}
+
+{# {{ forms.textField({
+    label: 'Some Attribute',
+    instructions: 'Enter some attribute here.',
+    id: 'someAttribute',
+    name: 'someAttribute',
+    value: field['someAttribute']})
+}} #}
