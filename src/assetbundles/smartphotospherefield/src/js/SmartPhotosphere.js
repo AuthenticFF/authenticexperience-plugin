@@ -67,7 +67,8 @@ var PhotoSphereViewer = require("photo-sphere-viewer");
                 var $el = $(this);
                 var coordinates = self.photosphere.getPosition();
 
-                coordinates = [coordinates.longitude, coordinates.latitude];
+                coordinates = [self.radiansToDegrees(coordinates.longitude), self.radiansToDegrees(coordinates.latitude)];
+
                 $el.val(coordinates);
 
                 // updating marker
@@ -268,6 +269,17 @@ var PhotoSphereViewer = require("photo-sphere-viewer");
           }
 
           return $editableTable;
+
+        }
+
+        /**
+         * Converting radian values to degrees
+         */
+        radiansToDegrees: function(radian){
+
+          var RAD2DEG = 57.2958;
+
+          return radian * RAD2DEG;
 
         }
 
