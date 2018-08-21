@@ -440,6 +440,8 @@ class SmartPhotosphere extends Field
       // attach to top-level field
       Craft::$app->getView()->registerJs("$('#{$namespacedId}-field').AuthenticExperienceSmartPhotosphere(" . $jsonVars . ");");
 
+      $url =
+
       //
       // Variables for input
       //
@@ -455,6 +457,11 @@ class SmartPhotosphere extends Field
       $variables["smartPhotosphereFeaturesId"] = $smartPhotosphereFeaturesId;
       $variables["smartPhotosphereFeaturesNamespacedId"] = $smartPhotosphereFeaturesNamespacedId;
       $variables["smartPhotosphereFeaturesRows"] = $featureRows;
+
+      $variables["smartPhotospherePublishedUrl"] = \Craft::$app->assetManager->getPublishedUrl('@authenticff/authenticexperience/assetbundles/smartphotospherefield/src/', true);
+
+      // var_dump($variables);
+      // die();
 
       // Render the input template
       return Craft::$app->getView()->renderTemplate(

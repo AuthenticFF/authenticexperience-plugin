@@ -66,13 +66,14 @@ var PhotoSphereViewer = require("photo-sphere-viewer");
                 // adding coordinates
                 var $el = $(this);
                 var coordinates = self.photosphere.getPosition();
-                var degreeCoordinates = [self.radiansToDegrees(coordinates.longitude), self.radiansToDegrees(coordinates.latitude)];
+                var radianCoords = [coordinates.longitude, coordinates.latitude];
+                var degreeCoords = [self.radiansToDegrees(radianCoords[0]), self.radiansToDegrees(radianCoords[1])];
 
-                $el.val(degreeCoordinates);
+                $el.val(degreeCoords);
 
                 // updating marker
                 var rowIndex = $el.parent().parent().data("id");
-                self.updateMarker(rowIndex, coordinates);
+                self.updateMarker(rowIndex, radianCoords);
 
               });
 
@@ -110,8 +111,11 @@ var PhotoSphereViewer = require("photo-sphere-viewer");
             anim_speed: '0rpm',
             default_fov: 30,
             sphere_correction: {pan: 4.7123, tilt: 0, roll: 0},
-            markers: this.markers
+            markers: this.markers,
+            fisheye: true
           });
+
+          console.log(this.photosphere);
 
           // moving marker
           this.photosphere.on("select-marker", function(marker, dblClick){
@@ -219,8 +223,13 @@ var PhotoSphereViewer = require("photo-sphere-viewer");
           var self = this;
 
           $.each(this.markers, function(index){
+
             var marker = this;
+
+            console.log(marker);
+
             self.photosphere.updateMarker(marker);
+
           });
 
         },
