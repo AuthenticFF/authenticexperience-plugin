@@ -66,10 +66,9 @@ var PhotoSphereViewer = require("photo-sphere-viewer");
                 // adding coordinates
                 var $el = $(this);
                 var coordinates = self.photosphere.getPosition();
+                var degreeCoordinates = [self.radiansToDegrees(coordinates.longitude), self.radiansToDegrees(coordinates.latitude)];
 
-                coordinates = [self.radiansToDegrees(coordinates.longitude), self.radiansToDegrees(coordinates.latitude)];
-
-                $el.val(coordinates);
+                $el.val(degreeCoordinates);
 
                 // updating marker
                 var rowIndex = $el.parent().parent().data("id");
@@ -151,9 +150,16 @@ var PhotoSphereViewer = require("photo-sphere-viewer");
           var markers = [];
 
           $.each(this.options.smartPhotosphereFeaturesRows, function(index){
+
             var coordinates = this.featureCoordinates.value.split(",");
+
+            coordinates[0] = self.degreesToRadians(coordinates[0]);
+            coordinates[1] = self.degreesToRadians(coordinates[1]);
+
             var newMarker = self.buildMarkerObject(index, coordinates);
+
             markers.push(newMarker);
+
           });
 
           return markers;
@@ -270,7 +276,7 @@ var PhotoSphereViewer = require("photo-sphere-viewer");
 
           return $editableTable;
 
-        }
+        },
 
         /**
          * Converting radian values to degrees
@@ -280,6 +286,17 @@ var PhotoSphereViewer = require("photo-sphere-viewer");
           var RAD2DEG = 57.2958;
 
           return radian * RAD2DEG;
+
+        },
+
+        /**
+         * Converting radian values to degrees
+         */
+        degreesToRadians: function(degrees){
+
+          var DEG2RAD = 57.2958;
+
+          return degrees / DEG2RAD;
 
         }
 
