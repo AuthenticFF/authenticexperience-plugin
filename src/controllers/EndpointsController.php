@@ -46,7 +46,7 @@ class EndpointsController extends Controller
      *         The actions must be in 'kebab-case'
      * @access protected
      */
-    protected $allowAnonymous = ['index', 'get-endpoint'];
+    protected $allowAnonymous = ['index', 'get-endpoint', 'has-team-and-project'];
 
     // Public Methods
     // =========================================================================
@@ -57,22 +57,22 @@ class EndpointsController extends Controller
     public function actionGetEndpoint()
     {
 
-      //$token = Craft::$app->request->getParam("token", false);
-      $token = "default-team:default-project";
-      $token = explode(":", $token);
+      $token = Craft::$app->request->getParam("activationToken", false);
+      $token = "default-teamm.default-project";
+      $token = explode(".", $token);
       $teamToken = $token[0];
       $projectToken = $token[1];
       $endpoint = false;
 
-      if($this->_hasTeamAndProject($teamToken, $projectToken))
-      {
-        $endpoint = Craft::$app->request->getHostInfo() . "/api";
-      }
-
-      else
-      {
+      // if($this->_hasTeamAndProject($teamToken, $projectToken))
+      // {
+      //   $endpoint = Craft::$app->request->getHostInfo() . "/api";
+      // }
+      //
+      // else
+      // {
         $endpoint = AuthenticExperience::getInstance()->endpoints->getRemoteEndpoint($teamToken, $projectToken);
-      }
+      // }
 
       /**
        * Error Handlding
@@ -103,7 +103,18 @@ class EndpointsController extends Controller
     public function actionHasTeamAndProject()
     {
 
-      $token = explode(":", $token);
+      $token = Craft::$app->request->getParam("activationToken", false);
+
+      if(! $token)
+      {
+        return $this->asJson([
+          "error" => [
+            "message" => "No token provided"
+          ]
+        ]);
+      }
+
+      $token = explode(".", $token);
       $teamToken = $token[0];
       $projectToken = $token[1];
 

@@ -67,7 +67,47 @@ class Endpoints extends Component
   public function getRemoteEndpoint($teamToken, $projectToken)
   {
 
-    return false;
+    $endpoint = false;
+
+    foreach ($this->allExperienceEndpoints as $url) {
+
+      if($endpoint !== false)
+      {
+        continue;
+      }
+
+      if($this->_makeRemoteEndpointRequest($url, $teamToken, $projectToken))
+      {
+        $endpoint = $url;
+      }
+
+    }
+
+    if($endpoint !== false)
+    {
+      $endpoint .= "/api";
+    }
+
+    return $endpoint;
+
+  }
+
+  /**
+   * Private Methods
+   */
+
+  public function _makeRemoteEndpointRequest($url, $teamToken, $projectToken)
+  {
+
+    $client = new \GuzzleHttp\Client();
+    $uri = '/actions/authentic-experience/endpoints/has-team-and-project';
+
+    $response = $client->request('GET', $url . $uri, [
+      "activationToken" => implode(".", [$teamToken, $projectToken])
+    ]);
+
+    var_dump($response);
+    die();
 
   }
 
