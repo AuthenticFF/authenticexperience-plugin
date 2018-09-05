@@ -1,0 +1,11 @@
+# Creating Authentication
+
+1. Create a controller action for "getEndpoint"
+
+2. getEndpoint action should check self if token has a match.
+
+2a. If token has a match, return the endpoint.
+
+2b. If token does not have a match, ping other Amplify instances until endpoint is received.
+
+3. Store token + endpoint match in Cache

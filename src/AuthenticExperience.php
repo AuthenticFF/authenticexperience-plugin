@@ -83,6 +83,10 @@ class AuthenticExperience extends Plugin
         parent::init();
         self::$plugin = $this;
 
+        $this->setComponents([
+          'endpoints' => \authenticff\authenticexperience\services\Endpoints::class,
+        ]);
+
         // Register our fields
         Event::on(
             Fields::class,
