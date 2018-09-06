@@ -103,11 +103,15 @@ class Endpoints extends Component
     $uri = '/actions/authentic-experience/endpoints/has-team-and-project';
 
     $response = $client->request('GET', $url . $uri, [
-      "activationToken" => implode(".", [$teamToken, $projectToken])
+      "query" => [
+        "activationToken" => implode(".", [$teamToken, $projectToken])
+      ]
     ]);
 
-    var_dump($response);
-    die();
+    $body = $response->getBody();
+    $hasTeamAndProject = json_decode($body)->data->hasTeamAndProject;
+
+    return $hasTeamAndProject;
 
   }
 

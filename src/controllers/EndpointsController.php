@@ -57,22 +57,32 @@ class EndpointsController extends Controller
     public function actionGetEndpoint()
     {
 
+      // $token = "default-team.default-project";
       $token = Craft::$app->request->getParam("activationToken", false);
-      $token = "default-teamm.default-project";
+
+      if(strpos($token, ".") === false)
+      {
+        return $this->asJson([
+          "error" => [
+            "message" => "Invalid token"
+          ]
+        ]);
+      }
+
       $token = explode(".", $token);
       $teamToken = $token[0];
       $projectToken = $token[1];
       $endpoint = false;
 
-      // if($this->_hasTeamAndProject($teamToken, $projectToken))
-      // {
-      //   $endpoint = Craft::$app->request->getHostInfo() . "/api";
-      // }
-      //
-      // else
-      // {
+      if($this->_hasTeamAndProject($teamToken, $projectToken))
+      {
+        $endpoint = Craft::$app->request->getHostInfo() . "/api";
+      }
+
+      else
+      {
         $endpoint = AuthenticExperience::getInstance()->endpoints->getRemoteEndpoint($teamToken, $projectToken);
-      // }
+      }
 
       /**
        * Error Handlding
@@ -110,6 +120,15 @@ class EndpointsController extends Controller
         return $this->asJson([
           "error" => [
             "message" => "No token provided"
+          ]
+        ]);
+      }
+
+      if(strpos($token, ".") === false)
+      {
+        return $this->asJson([
+          "error" => [
+            "message" => "Invalid token"
           ]
         ]);
       }
