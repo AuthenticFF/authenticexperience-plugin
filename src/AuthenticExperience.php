@@ -174,7 +174,17 @@ class AuthenticExperience extends Plugin
             ->type($featuresObject)
             ->lists()
             ->resolve(function($root, $args) {
-              return $root["smartPhotosphereFeatures"];
+
+              if(empty($root["smartPhotosphereFeatures"]))
+              {
+                return [];
+              }
+
+              else
+              {
+                return $root["smartPhotosphereFeatures"];
+              }
+
             });
 
           $schema->addField($field)
