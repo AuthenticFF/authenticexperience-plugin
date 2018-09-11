@@ -84,7 +84,7 @@ class AuthenticExperience extends Plugin
         self::$plugin = $this;
 
         $this->setComponents([
-          'endpoints' => \authenticff\authenticexperience\services\Endpoints::class,
+          'tokens' => \authenticff\authenticexperience\services\Tokens::class,
         ]);
 
         // Register our fields
