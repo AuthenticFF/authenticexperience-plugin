@@ -46,52 +46,57 @@ class EndpointsController extends Controller
      *         The actions must be in 'kebab-case'
      * @access protected
      */
-    protected $allowAnonymous = ['index', 'get-endpoint', 'has-team-and-project'];
+    protected $allowAnonymous = ['get-token-data', 'get-remote-token-data'];
 
     // Public Methods
     // =========================================================================
 
     /**
-     * This is called from our App to get our projects endpoint
+     * An action endpoint that returns us our token information: endpoint, team data, accessible projects, accessible experiences
      */
-    public function actionGetEndpoint()
+    public function actionGetTokenData()
     {
 
-      // $token = "default-team.default-project";
       $token = Craft::$app->request->getParam("activationToken", false);
 
-      if(strpos($token, ".") === false)
-      {
-        return $this->asJson([
-          "error" => [
-            "message" => "Invalid token"
-          ]
-        ]);
-      }
-
-      $token = explode(".", $token);
-      $teamToken = $token[0];
-      $projectToken = $token[1];
       $endpoint = false;
+      $teamData = false;
 
-      if($this->_hasTeamAndProject($teamToken, $projectToken))
+      if($tokenEntry = AuthenticExperience::getInstance()->endpoints->getToken($token))
       {
-        $endpoint = Craft::$app->request->getHostInfo() . "/api";
+
+        if(AuthenticExperience::getInstance()->endpoints->validateTokenRelationships($tokenEntry))
+        {
+
+          // Get local token data
+          $endpoint = Craft::$app->request->getHostInfo() . "/api";
+          $teamData = AuthenticExperience::getInstance()->endpoints->getTeamData($tokenEntry);
+
+        }
+
+        else
+        {
+
+          return $this->asJson([
+            "error" => [
+              "message" => AuthenticExperience::getInstance()->endpoints->getValidationErrorMessage()
+            ]
+          ]);
+
+        }
+
       }
 
       else
       {
-        $endpoint = AuthenticExperience::getInstance()->endpoints->getRemoteEndpoint($teamToken, $projectToken);
+          $teamData = AuthenticExperience::getInstance()->endpoints->getRemoteTokenData($token);
       }
 
-      /**
-       * Error Handlding
-       */
       if($endpoint === false)
       {
         return $this->asJson([
           "error" => [
-            "message" => "Endpoint not found"
+            "message" => "Token not found"
           ]
         ]);
       }
@@ -101,75 +106,72 @@ class EndpointsController extends Controller
        */
       return $this->asJson([
         "data" => [
-          "endpoint" => $endpoint
+          "endpoint" => $endpoint,
+          "team" => $teamData
         ]
       ]);
 
     }
 
     /**
-     * This is called from another Craft instance, to determine if we own the team and project
+     * This is called from another Craft instance, to get our remote token data
      */
-    public function actionHasTeamAndProject()
+    public function actionGetRemoteTokenData()
     {
 
       $token = Craft::$app->request->getParam("activationToken", false);
+      $endpoint = false;
+      $teamData = false;
 
-      if(! $token)
+      if($tokenEntry = AuthenticExperience::getInstance()->endpoints->getToken($token))
       {
-        return $this->asJson([
-          "error" => [
-            "message" => "No token provided"
-          ]
-        ]);
+
+        if(AuthenticExperience::getInstance()->endpoints->validateTokenRelationships($tokenEntry))
+        {
+
+          // Get local token data
+          $endpoint = Craft::$app->request->getHostInfo() . "/api";
+          $teamData = AuthenticExperience::getInstance()->endpoints->getTeamData($tokenEntry);
+
+        }
+
+        else
+        {
+
+          return $this->asJson([
+            "error" => [
+              "message" => AuthenticExperience::getInstance()->endpoints->getValidationErrorMessage()
+            ]
+          ]);
+
+        }
+
       }
 
-      if(strpos($token, ".") === false)
+      else
       {
+
+        /**
+         * Token not found here
+         */
         return $this->asJson([
-          "error" => [
-            "message" => "Invalid token"
+          "data" => [
+            "hasToken" => false
           ]
         ]);
+
       }
 
-      $token = explode(".", $token);
-      $teamToken = $token[0];
-      $projectToken = $token[1];
-
-      $hasTeamAndProject = $this->_hasTeamAndProject($teamToken, $projectToken);
-
+      /**
+       * Returning the correct endpoint
+       */
       return $this->asJson([
         "data" => [
-          "hasTeamAndProject" => $hasTeamAndProject
+          "hasToken" => true,
+          "endpoint" => $endpoint,
+          "team" => $teamData
         ]
       ]);
-
-    }
-
-    /**
-     * Private methods
-     */
-
-     /**
-      * A non-action version of the method for internal use
-      */
-    public function _hasTeamAndProject($teamToken, $projectToken)
-    {
-
-      $hasTeamAndProject = true;
-
-      if(! $team = AuthenticExperience::getInstance()->endpoints->getTeam($teamToken))
-      {
-        $hasTeamAndProject = false;
-      }
-
-      if(! $team = AuthenticExperience::getInstance()->endpoints->getProject($projectToken))
-      {
-        $hasTeamAndProject = false;
-      }
-
-      return $hasTeamAndProject;
 
     }
 

@@ -16,17 +16,28 @@ class Endpoints extends Component
   ];
 
   /**
-   * Getting a team based on the token provided
+   * An error message we return if validation fails
    */
-  public function getTeam($token)
+  public $validationErrorMessage = false;
+
+
+
+  public function getToken($token)
   {
 
     $entries = Entry::find()
-        ->section('expTeams')
-        ->slug($token)
-        ->one();
+      ->section("expTokens")
+      ->with(["expTokenTeam"])
+      ->search([
+        "attribute" => "expTokenToken",
+        "query" => $token,
+        "exact" => true,
+        "subLeft" => false,
+        "subRight" => false
+      ])
+      ->one();
 
-    if(count($entries))
+    if($entries)
     {
       return $entries;
     }
@@ -39,56 +50,106 @@ class Endpoints extends Component
   }
 
   /**
-   * Getting the project based on the slug
+   * Making sure our token has the necessary relationships
    */
-  public function getProject($token)
+  public function validateTokenRelationships($tokenEntry)
   {
 
-    $entries = Entry::find()
-        ->section('expProjects')
-        ->slug($token)
-        ->one();
+    // Validate Teams
 
-    if(count($entries))
+    if(! count($tokenEntry->expTokenTeam))
     {
-      return $entries;
-    }
-
-    else
-    {
+      $this->validationErrorMessage = "Token not assigned to team.";
       return false;
     }
 
+    // Validate Projects
+    $teamEntry = $tokenEntry->expTokenTeam[0];
+
+    if(! count($teamEntry->expTeamProjects))
+    {
+      $this->validationErrorMessage = "Team not assigned to projects.";
+      return false;
+    }
+
+    return true;
+
   }
+
+  /**
+   * Getting our validation error message
+   */
+  public function getValidationErrorMessage()
+  {
+
+    $message = $this->validationErrorMessage;
+
+    $this->validationErrorMessage = false;
+
+    return $message;
+
+  }
+
+  /**
+   * Getting our team data
+   */
+  public function getTeamData($tokenEntry)
+  {
+
+    $teamData = false;
+
+    if(count($tokenEntry->expTokenTeam))
+    {
+
+      $teamEntry = $tokenEntry->expTokenTeam[0];
+
+      $teamData = [
+        "teamTitle" => $teamEntry->title,
+        "teamDisplayName" => $teamEntry->expTeamDisplayName,
+        "teamImage" => count($teamEntry->expTeamImage) ? $teamEntry->expTeamImage->first()->url : false,
+        "teamBio" => $teamEntry->expTeamBio,
+        "teamProjects" => count($teamEntry->expTeamProjects) ? array_map('intval', $teamEntry->expTeamProjects->ids()) : false,
+      ];
+
+    }
+
+    return $teamData;
+
+  }
+
+  /**
+   * Getting our experience ids
+   */
+  public function getExperiencesData($tokenEntry)
+  {
+
+    return [];
+
+  }
+
 
   /**
    * Fetching our remote endpoints
    */
-  public function getRemoteEndpoint($teamToken, $projectToken)
+  public function getRemoteTokenData($token)
   {
 
-    $endpoint = false;
+    $remoteTokenData = false;
 
     foreach ($this->allExperienceEndpoints as $url) {
 
-      if($endpoint !== false)
+      if($remoteTokenData !== false)
       {
         continue;
       }
 
-      if($this->_makeRemoteEndpointRequest($url, $teamToken, $projectToken))
-      {
-        $endpoint = $url;
-      }
+      $remoteTokenData = $this->_makeRemoteEndpointRequest($url, $token);
 
     }
 
-    if($endpoint !== false)
-    {
-      $endpoint .= "/api";
-    }
+    var_dump($remoteTokenData);
 
-    return $endpoint;
+    return $remoteTokenData;
 
   }
 
@@ -96,22 +157,38 @@ class Endpoints extends Component
    * Private Methods
    */
 
-  public function _makeRemoteEndpointRequest($url, $teamToken, $projectToken)
+  public function _makeRemoteEndpointRequest($url, $token)
   {
 
     $client = new \GuzzleHttp\Client();
-    $uri = '/actions/authentic-experience/endpoints/has-team-and-project';
+    $uri = '/actions/authentic-experience/endpoints/get-remote-token-data';
 
     $response = $client->request('GET', $url . $uri, [
       "query" => [
-        "activationToken" => implode(".", [$teamToken, $projectToken])
+        "activationToken" => $token
       ]
     ]);
 
     $body = $response->getBody();
-    $hasTeamAndProject = json_decode($body)->data->hasTeamAndProject;
+    $jsonBody = json_decode($body);
 
-    return $hasTeamAndProject;
+    // error with token or configuration
+    if(isset($jsonBody->error))
+    {
+      return false;
+    }
+
+    // we're good
+    elseif($jsonBody->data->hasToken)
+    {
+      return $jsonBody->data;
+    }
+
+    // no token found
+    else
+    {
+      return false;
+    }
 
   }
 
