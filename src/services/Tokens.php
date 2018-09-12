@@ -233,7 +233,8 @@ class Tokens extends Component
         {
           $markers[] = [
             "url" => $tokenEntry->expTokenImageMarker[0]->url,
-            "token" => $tokenEntry->expTokenToken
+            "token" => $tokenEntry->expTokenToken,
+            "siteUrl" => \Craft::$app->request->getHostInfo()
           ];
         }
       }
@@ -257,16 +258,13 @@ class Tokens extends Component
 
     $remoteMarkerData = [];
 
-    foreach ($this->allExperienceEndpoints as $url) {
-
+    foreach ($this->allExperienceEndpoints as $url)
+    {
       $endpointMarkerData = $this->_makeRemoteImageMarkerRequest($url);
-
-      var_dump($endpointMarkerData);
-      die();
-
+      $remoteMarkerData = array_merge($remoteMarkerData, $endpointMarkerData["imageMarkers"]);
     }
 
-    return $remoteTokenData;
+    return $remoteMarkerData;
 
   }
 
@@ -276,7 +274,7 @@ class Tokens extends Component
   public function _makeRemoteImageMarkerRequest($url)
   {
     $client = new \GuzzleHttp\Client();
-    $uri = '/actions/authentic-experience/tokens/get-remote-image-markers';
+    $uri = '/actions/authentic-experience/tokens/get-local-image-markers';
 
     $response = $client->request('GET', $url . $uri);
 
