@@ -143,6 +143,12 @@ class Tokens extends Component
         continue;
       }
 
+      // making sure we don't double request with a local url
+      if($url === \Craft::$app->request->getHostInfo())
+      {
+        continue;
+      }
+
       $remoteTokenData = $this->_makeRemoteEndpointRequest($url, $token);
 
     }
@@ -260,8 +266,16 @@ class Tokens extends Component
 
     foreach ($this->allExperienceEndpoints as $url)
     {
+
+      // making sure we don't double request with a local url
+      if($url === \Craft::$app->request->getHostInfo())
+      {
+        continue;
+      }
+
       $endpointMarkerData = $this->_makeRemoteImageMarkerRequest($url);
       $remoteMarkerData = array_merge($remoteMarkerData, $endpointMarkerData["imageMarkers"]);
+
     }
 
     return $remoteMarkerData;
