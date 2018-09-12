@@ -46,7 +46,7 @@ class TokensController extends Controller
      *         The actions must be in 'kebab-case'
      * @access protected
      */
-    protected $allowAnonymous = ['get-token-data', 'get-remote-token-data'];
+    protected $allowAnonymous = ['get-token-data', 'get-remote-token-data', 'get-all-image-markers', 'get-local-image-markers'];
 
     // Public Methods
     // =========================================================================
@@ -188,5 +188,35 @@ class TokensController extends Controller
 
     }
 
+    /**
+     * Returning an array of our local and remote image marker data
+     */
+     public function actionGetAllImageMarkers()
+     {
+
+       $localMarkersOnly = false;
+       $imageMarkerData = AuthenticExperience::getInstance()->tokens->getImageMarkers($localMarkersOnly);
+
+       return $this->asJson([
+         "data" => [
+           "imageMarkers" => $imageMarkerData
+         ]
+       ]);
+
+     }
+
+     public function actionGetLocalImageMarkers()
+     {
+
+       $localMarkersOnly = true;
+       $imageMarkerData = AuthenticExperience::getInstance()->tokens->getImageMarkers($localMarkersOnly);
+
+       return $this->asJson([
+         "data" => [
+           "imageMarkers" => $imageMarkerData
+         ]
+       ]);
+
+     }
 
 }

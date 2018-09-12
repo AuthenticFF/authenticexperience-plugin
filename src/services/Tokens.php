@@ -152,6 +152,26 @@ class Tokens extends Component
   }
 
   /**
+   * Get image markers
+   */
+  public function getImageMarkers($localMarkersOnly = true)
+  {
+
+    $imageMarkerData = [];
+    $localImageMarkers = $this->_getLocalImageMarkers();
+    $imageMarkerData = array_merge($imageMarkerData, $localImageMarkers);
+
+    if($localMarkersOnly === false)
+    {
+      $remoteImageMarkers = $this->_getRemoteImageMarkers();
+      $imageMarkerData = array_merge($imageMarkerData, $remoteImageMarkers);
+    }
+
+    return $imageMarkerData;
+
+  }
+
+  /**
    * Private Methods
    */
 
@@ -187,6 +207,93 @@ class Tokens extends Component
     else
     {
       return false;
+    }
+
+  }
+
+  /**
+   * Returning our local image markers
+   */
+  public function _getLocalImageMarkers()
+  {
+
+    $entries = Entry::find()
+      ->section("expTokens")
+      ->with("expTokenImageMarker")
+      ->all();
+
+    if($entries)
+    {
+
+      $markers = [];
+
+      foreach($entries as $tokenEntry)
+      {
+        if(count($tokenEntry->expTokenImageMarker))
+        {
+          $markers[] = [
+            "url" => $tokenEntry->expTokenImageMarker[0]->url,
+            "token" => $tokenEntry->expTokenToken
+          ];
+        }
+      }
+
+      return $markers;
+
+    }
+
+    else
+    {
+      return false;
+    }
+
+  }
+
+  /**
+   * Getting our remote image markers
+   */
+  public function _getRemoteImageMarkers()
+  {
+
+    $remoteMarkerData = [];
+
+    foreach ($this->allExperienceEndpoints as $url) {
+
+      $endpointMarkerData = $this->_makeRemoteImageMarkerRequest($url);
+
+      var_dump($endpointMarkerData);
+      die();
+
+    }
+
+    return $remoteTokenData;
+
+  }
+
+  /**
+   * Our actual request for getting remote image markers
+   */
+  public function _makeRemoteImageMarkerRequest($url)
+  {
+    $client = new \GuzzleHttp\Client();
+    $uri = '/actions/authentic-experience/tokens/get-remote-image-markers';
+
+    $response = $client->request('GET', $url . $uri);
+
+    $body = $response->getBody();
+    $jsonBody = json_decode($body);
+
+    // error with token or configuration
+    if(isset($jsonBody->error))
+    {
+      return false;
+    }
+
+    // we're good
+    else
+    {
+      // converting Std class back to an array
+      return json_decode(json_encode($jsonBody->data), true);
     }
 
   }
