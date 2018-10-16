@@ -50,7 +50,15 @@ var PhotoSphereViewer = require("photo-sphere-viewer");
               // Binding to the Element Select field, to load our image after it's been selected
               //
               $('#' + self.options.smartPhotosphereAssetNamespacedId).data('elementSelect').on('selectElements', function(e) {
+
+                console.log("SELECT");
+
+                if(typeof self.photosphere !== "undefined"){
+                  self.photosphere.destroy();
+                }
+
                 self.loadAsset(e.elements[0].id);
+
               });
 
               //
