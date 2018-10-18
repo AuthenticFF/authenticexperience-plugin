@@ -36,7 +36,7 @@
   "dependencies": {
     "dat.gui": "^0.7.0",
     "npm": "^6.3.0",
-    "photo-sphere-viewer": "^3.4.0",
+    "photo-sphere-viewer": "^3.4.1",
     "three": "^0.85.0",
     "three-vignette-background": "^1.0.3",
     "underscore": "^1.9.1"

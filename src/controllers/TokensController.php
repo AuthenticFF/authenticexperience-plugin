@@ -90,6 +90,7 @@ class TokensController extends Controller
       // Setting our remote token data
       else
       {
+
           if($tokenData = AuthenticExperience::getInstance()->tokens->getRemoteTokenData($token))
           {
             $endpoint = $tokenData["endpoint"];

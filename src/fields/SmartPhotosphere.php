@@ -44,7 +44,7 @@ class SmartPhotosphere extends Field
      *
      * @var string
      */
-    public $someAttribute = 'Some Default';
+    public $someAttribute = '';
 
     public $smartPhotosphereData = [
       "smartPhotosphereAssetId" => [],
@@ -79,11 +79,10 @@ class SmartPhotosphere extends Field
      */
     public function rules()
     {
+
         $rules = parent::rules();
-        $rules = array_merge($rules, [
-            // ['someAttribute', 'string'],
-            // ['someAttribute', 'default', 'value' => 'Some Default'],
-        ]);
+        // $rules[] = ['someAttribute', 'required'];
+
         return $rules;
     }
 

@@ -96,7 +96,9 @@ var PhotoSphereViewer = require("photo-sphere-viewer");
 
               // If we already have an asset loaded, load it in the viewer
               if(self.options.assetUrl){
+
                 self.initPhotosphereViewer(self.options.assetUrl);
+
               }
 
               return;
@@ -113,14 +115,18 @@ var PhotoSphereViewer = require("photo-sphere-viewer");
           var self = this;
           this.markers = this.getMarkers();
 
+          console.log(fileUrl);
+
           this.photosphere = new PhotoSphereViewer({
             container: self.$viewerEl[0],
             panorama: fileUrl,
             anim_speed: '0rpm',
-            default_fov: 30,
+            default_fov: 55,
             sphere_correction: {pan: 4.7123, tilt: 0, roll: 0},
             markers: this.markers,
-            fisheye: true
+            fisheye: false,
+            mousewheel: false,
+            navbar: false
           });
 
           console.log(this.photosphere);

@@ -186,7 +186,7 @@ class Tokens extends Component
   {
 
     $client = new \GuzzleHttp\Client();
-    $uri = '/actions/authentic-experience/endpoints/get-remote-token-data';
+    $uri = '/actions/authentic-experience/tokens/get-remote-token-data';
 
     $response = $client->request('GET', $url . $uri, [
       "query" => [
