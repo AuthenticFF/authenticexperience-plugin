@@ -432,7 +432,7 @@ class SmartPhotosphere extends Field
         'smartPhotosphereFeaturesNamespacedId' => $smartPhotosphereFeaturesNamespacedId,
         'smartPhotosphereFeaturesRows' => $featureRows,
         'prefix' => Craft::$app->getView()->namespaceInputId(''),
-        'assetUrl' => $assetElements ? $assetElements[0]->url : false
+        'assetUrl' => ($assetElements && count($assetElements))? $assetElements[0]->url : false
         ];
       $jsonVars = Json::encode($jsonVars);
 
