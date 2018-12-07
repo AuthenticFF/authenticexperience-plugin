@@ -13,8 +13,8 @@ class Tokens extends Component
    */
   protected $allExperienceEndpoints = [
     'https://boilerplate.amplify.authenticff.com',
-    'https://76commercecenter.authenticff.com',
-    'https://northernstacks.authenticff.com',
+    'https://www.76commercecenter.com',
+    'https://www.northernstacksmn.com',
     'https://tritenre.com'
   ];
 
